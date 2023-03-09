@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import medicine from '../../assets/medicine.svg';
 
-const Navbar = () => {
+const Navbar = ({_id, email, username, rol, ...restUser}) => {
     const [navbarOpen, setNavbarOpen] = useState(false);
     const [navbarMenuOpen, setNavbarMenuOpen] = useState(false);
 
@@ -23,8 +23,8 @@ const Navbar = () => {
                     {/*Dropdown menu */}
                     <div className={'z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800 dark:divide-gray-600' + (navbarOpen ? ' absolute top-12 right-11':' hidden')} id="user-dropdown"  >
                         <div className='px-4 py-3' >
-                            <span className='block text-sm text-gray-900 dark:text-white' >Cristian Gomez</span>
-                            <span className='block text-sm font-medium text-gray-500 truncate dark:text-gray-400' >gmz@gmail.com</span>
+                            <span className='block text-sm text-gray-900 dark:text-white' >{username}</span>
+                            <span className='block text-sm font-medium text-gray-500 truncate dark:text-gray-400' >{email}</span>
                         </div>
                     
                         <ul className='py-2' aria-labelledby="user-menu-button" >
@@ -32,7 +32,7 @@ const Navbar = () => {
                                 <Link to={'/settings'} className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white' >Settings</Link>
                             </li>
                             <li>
-                                <Link to={'/login'} className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white' >Log Out</Link>
+                                <Link to={'/logout'} className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white' >Log Out</Link>
                             </li>
                         </ul>                    
                     </div>

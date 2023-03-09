@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import medicine from '../../assets/medicine.svg';
 import { loginEp } from '../../services/auth.services';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/auth.context';
 
 const Auth = () => {
     const navigate = useNavigate();
+    const { storeToken, authenticateUser } = useContext(AuthContext);
 
     const [values, setValues] = useState({
         email: "",
@@ -16,7 +19,10 @@ const Auth = () => {
         try {
             e.preventDefault();
             const body = {...values};
-            await loginEp(body);
+            const response = await loginEp(body);
+            console.log('Que es response', response)
+            storeToken(response.data._token);
+            await authenticateUser();
             navigate('/');
         } catch (error) {
             if (error.response) {
@@ -25,7 +31,7 @@ const Auth = () => {
                     password: ""
                 })
                 navigate('/login');
-                return error.response.data
+                return error.response.data.errorMsg
               } else if (error.request) {
                 return error.request;
               } else {

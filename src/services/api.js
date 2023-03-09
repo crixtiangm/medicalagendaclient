@@ -5,5 +5,16 @@ const _api = axios.create({
     timeout:5000
 });
 
+_api.interceptors.request.use((config) => {
+
+    const storedToken = localStorage.getItem('_token');
+
+    if(storedToken){
+        config.headers = {
+            Authorization: `Bearer ${storedToken}`
+        }
+    }
+    return config;
+})
 
 export default _api;
