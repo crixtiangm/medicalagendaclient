@@ -48,7 +48,7 @@ const Day = ({day, rowIdx}) => {
                         onClick={() => setSelectedEvent(evt)}
                         className={`bg-${evt.label}-200 p-1 text-gray-600 text-sm rounded mb-1 truncate`}
                     >
-                        {evt.name}
+                        {evt.patient}
                     </div>
                 ))}
 

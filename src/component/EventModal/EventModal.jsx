@@ -12,8 +12,8 @@ const EventModal = () => {
         selectedEvent
     } = useContext(GlobalContext);
 
-    const [name, setName] = useState(
-        selectedEvent ? selectedEvent.name : ''
+    const [patient, setPatient] = useState(
+        selectedEvent ? selectedEvent.patient : ''
     );
 
     const [description, setDescription] = useState(
@@ -29,7 +29,7 @@ const EventModal = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const calendarEvent = {
-            name,
+            patient,
             description,
             label: selectedLabel,
             day: daySelected.valueOf(),
@@ -65,12 +65,12 @@ const EventModal = () => {
                         <div></div>
                         <input 
                             type="text" 
-                            name="name"
+                            name="patient"
                             placeholder="Add name patient"
-                            value={name}
+                            value={patient}
                             required
                             className="pt-3 border-0 text-gray-600 text-xl font-semibold pb-2 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setPatient(e.target.value)}
                         />
 
                         <span className="material-icons text-gray-400">

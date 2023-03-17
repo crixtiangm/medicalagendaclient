@@ -20,7 +20,6 @@ const Auth = () => {
             e.preventDefault();
             const body = {...values};
             const response = await loginEp(body);
-            console.log('Que es response', response)
             storeToken(response.data._token);
             await authenticateUser();
             navigate('/');
