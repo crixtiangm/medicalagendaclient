@@ -20,9 +20,14 @@ const Day = ({day, rowIdx}) => {
     };
 
     useEffect(() => {
-        const events = filteredEvents.filter((evt) => 
-        dayjs(evt.day).format('DD-MM-YY') === day.format('DD-MM-YY'));
-        setDayEvents(events);
+        const filteredEvt = async () => {
+            const fltredEvt = await filteredEvents;
+            const events = fltredEvt.filter((evt) => 
+            dayjs(evt.day).format('DD-MM-YY') === day.format('DD-MM-YY'));
+            setDayEvents(events);
+        }
+        filteredEvt()
+            .catch(console.error);
     },[filteredEvents, day])
 
     return(

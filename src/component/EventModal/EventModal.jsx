@@ -1,10 +1,12 @@
 import { useContext, useState } from "react";
+import { AuthContext } from '../../context/auth.context';
 import { GlobalContext } from "../../context/contextWrapper";
 
 const labelsColors = ['indigo', 'gray', 'green', 'blue', 'red', 'purple'];
 
 const EventModal = () => {
 
+    const { user } = useContext(AuthContext);
     const {
         setShowEventModal,
         daySelected,
@@ -33,13 +35,13 @@ const EventModal = () => {
             description,
             label: selectedLabel,
             day: daySelected.valueOf(),
-            id: selectedEvent ? selectedEvent.id : Date.now()
+            id_user: user._id,
+            _id: selectedEvent ? selectedEvent._id : ''
         };
-
         if (selectedEvent) {
             dispatchCalEvent({type: 'update', payload: calendarEvent});
         } else {
-            dispatchCalEvent({type: 'push', payload: calendarEvent});
+            dispatchCalEvent({type: 'create', payload: calendarEvent});
         }
         setShowEventModal(false);
     };
@@ -52,6 +54,17 @@ const EventModal = () => {
                         drag_handle
                     </span>
                     <div>
+                        {selectedEvent && (
+                            <span 
+                                onClick={() => {
+                                    dispatchCalEvent({type: 'delete', payload: selectedEvent});
+                                    setShowEventModal(false);
+                                }}
+                                className="material-icons text-gray-400 cursor-pointer"
+                            >
+                                delete
+                            </span>
+                        )}
                         <button onClick={() => setShowEventModal(false)}>
                             <span className="material-icons text-gray-400" >
                                 close

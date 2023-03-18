@@ -1,4 +1,5 @@
 import { useState, createContext, useEffect, useReducer, useMemo } from "react";
+import { addPatientEp, listPatientEp, editPatientEp, deletePatientEp } from '../services/schedule.services.js';
 import dayjs from "dayjs";
 
 const GlobalContext = createContext({
@@ -20,25 +21,63 @@ const GlobalContext = createContext({
     filteredEvents: []
 });
 
-const savedEventsReducer = (state, {type, payload}) => {
+const addScheduledPatient = async (data) => {
+    try {
+        await addPatientEp(data);
+    } catch (error) {
+        console.log('Error addScheduled', error);
+    };
+};
+
+const updateScheduledPatient = async (data) => {
+    try {
+        await editPatientEp(data);
+    } catch (error) {
+        console.log('Error updateScheduled', error);
+    };
+};
+
+const deleteScheduledPatient = async (eventId) => {
+    try {
+        await deletePatientEp(eventId);
+    } catch (error) {
+        console.log('Error deleteScheduled', error);
+    }
+}
+
+const listPatientScheluded = async () => {
+    try {
+        const listPatients = await listPatientEp();
+        return listPatients.data;
+    } catch (error) {
+        console.log('Error', error);
+    };
+};
+
+const savedEventsReducer = async (state, {type, payload}) => {
     switch(type){
-        case 'push':
+        case 'create':
+            addScheduledPatient(payload);
+            state = await listPatientScheluded();
             return [...state, payload];
         case 'update':
-            return state.map(evt => evt.id === payload.id ? payload : evt);
+            updateScheduledPatient(payload);
+            state = await listPatientScheluded();
+            return state.map(evt => evt._id === payload._id ? payload : evt);
         case 'delete':
-            return state.filter(evt => evt.id !== payload.id);
+            deleteScheduledPatient(payload._id);
+            state = await listPatientScheluded();
+            return state.filter(evt => evt._id !== payload._id);
         default:
             throw new Error();
     };
 };
 
-const initEvents = () => {
-    const storageEvents = localStorage.getItem('savedEvents');
-    const parseEvents = storageEvents ?  JSON.parse(storageEvents) : [];
-    console.log('que es parseEvents', parseEvents)
-    return parseEvents;
-}
+const initEvents = async () => { 
+    const listPat = await listPatientScheluded();
+    const listStorageEvents = listPat ? listPat: [];
+    return listStorageEvents;
+};
 
 const ContextWrapper = (props) => {
 
@@ -50,34 +89,42 @@ const ContextWrapper = (props) => {
     const [labels, setLabels] = useState([]);
     const [savedEvents, dispatchCalEvent] = useReducer(savedEventsReducer, [], initEvents);
 
-    const filteredEvents = useMemo(() => {
-        return savedEvents.filter((evt) =>
-            labels
-            .filter((lbl) => lbl.checked)
-            .map((lbl) => lbl.label)
-            .includes(evt.label)
-        );
+    const filteredEvents = useMemo (() => {
+        const svdEvt = async () => {
+            const savedEvts = await savedEvents;
+
+            return savedEvts.filter((evt) =>
+                labels
+                .filter((lbl) => lbl.checked)
+                .map((lbl) => lbl.label)
+                .includes(evt.label)
+            );
+        }
+        return svdEvt()
+                    .catch(console.error);
     }, [savedEvents, labels]);
 
     const updateLabel = (label) => {
         setLabels(labels.map((lbl)=> lbl.label === label.label ? label : lbl))
     }
 
-    useEffect(() => {
-        localStorage.setItem('savedEvents', JSON.stringify(savedEvents));
-    }, [savedEvents]);
+    useEffect( () => {
+        const svdEvt = async () => {
+            const savedEvts = await savedEvents;
+            setLabels((prevLabels) => {
+                return [...new Set( savedEvts.map(evt => evt.label))].map(label => {
+                    const currentLabel = prevLabels.find(lbl => lbl.label === label);
+                    return {
+                        label,
+                        checked: currentLabel ? currentLabel.checked : true
+                    };
+                });
+            });
+        };
 
-    useEffect(()=> {
-        setLabels((prevLabels) => {
-            return [...new Set( savedEvents.map(evt => evt.label))].map(label => {
-                const currentLabel = prevLabels.find(lbl => lbl.label === label)
-                return {
-                    label,
-                    checked: currentLabel ? currentLabel.checked : true
-                }
-            })
-        })
-    },[savedEvents])
+        svdEvt()
+            .catch(console.error);
+    },[savedEvents]);
 
     useEffect(()=>{
         if(smallCalendarMonth !== null){
