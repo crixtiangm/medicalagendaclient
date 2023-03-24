@@ -3,6 +3,10 @@ import { Navbar } from "../../component";
 import { AuthContext } from '../../context/auth.context';
 import { useNavigate } from 'react-router-dom';
 import { singupEp } from "../../services/collaborator.services";
+import Swal from "sweetalert2";
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 const Singup = () => {
 
@@ -24,6 +28,15 @@ const Singup = () => {
         setStatus('Active');
     }
 
+    const showAlert = () => {
+        MySwal.fire({
+            title: "¡Registro exitoso!",
+            text:"Los datos fueron registrados correctamente",
+            icon: "success",
+            timer: 4000
+        })
+    }
+
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
@@ -37,7 +50,7 @@ const Singup = () => {
             await singupEp(payload);
             setError([]);
             clearInputs();
-            navigate('/data-collaborator');
+            showAlert();
         } catch (error) {
             if(error.response.status === 400){
                 setError(error.response.data.errorMsg);

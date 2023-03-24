@@ -3,6 +3,10 @@ import { Navbar } from "../../component";
 import { AuthContext } from '../../context/auth.context';
 import { useNavigate } from 'react-router-dom';
 import { collaboratorEp } from "../../services/collaborator.services";
+import Swal from "sweetalert2";
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 
 const Collaborator = () => {
@@ -26,6 +30,15 @@ const Collaborator = () => {
         setPhone('');
     }
 
+    const showAlert = () => {
+        MySwal.fire({
+            title: "¡Registro exitoso!",
+            text:"Los datos del colaborador fueron registrados correctamente",
+            icon: "success",
+            timer: 4000
+        })
+    }
+
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
@@ -40,7 +53,7 @@ const Collaborator = () => {
             await collaboratorEp(payload);
             setErrors([]);
             clearInputs();
-            navigate('/');
+            showAlert();
         } catch (error) {
             if(error.response.status === 400){
                 setErrors(error.response.data.errorMsg);
