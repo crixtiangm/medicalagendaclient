@@ -1,6 +1,6 @@
 import './App.css';
 import { Route, Routes } from 'react-router-dom'
-import { Auth, Collaborator, ForgotPass, Home, LogoutPage, Singup } from './pages'
+import { Auth, Collaborator, ForgotPass, Home, LogoutPage, Patient, Singup } from './pages'
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
         <Route path='/logout' element={<LogoutPage />} />
         <Route path='/register-user' element={<Singup />} />
         <Route path='/data-collaborator' element={<Collaborator />} />
+        <Route path='/register-patient' element={<Patient />} />
 
         <Route path='*' element={<h1>404</h1>} />
       </Routes>
