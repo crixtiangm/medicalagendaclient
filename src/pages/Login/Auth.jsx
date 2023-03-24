@@ -14,6 +14,10 @@ const Auth = () => {
         email: "",
         password: ""
     })
+    const [msgError, setMsgError] = useState({
+        error: false,
+        msg: ""
+    });
 
     const handleOnSubmit = async(e) => {
         try {
@@ -30,9 +34,13 @@ const Auth = () => {
                     password: ""
                 })
                 navigate('/login');
-                return error.response.data.errorMsg
+                setMsgError({
+                    error: true,
+                    msg: "Usuario o contraseña incorrectos"
+                })
+                return error.response.data.errorMsg;
               } else if (error.request) {
-                return error.request;
+                return error//.request;
               } else {
                 console.log('Error', error.message);
               };
@@ -51,6 +59,7 @@ const Auth = () => {
         }
     }
 
+    
 
     return(
         <section className="h-scren mt-10">
@@ -64,6 +73,11 @@ const Auth = () => {
                             <div>
                                 <h1 className="text-4xl my-5 font-extrabold text-center">Medical<span className="font-normal text-blue-500">Agenda</span></h1>
                             </div>
+                            { msgError.error ?
+                            <div>
+                                <p class="bg-red-600 text-white uppercase text-xs text-center p-2 mb-1 font-bold rounded-md">{msgError.msg}</p>
+                            </div> : ""
+                            }
                             <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
                             </div>
 
@@ -76,6 +90,7 @@ const Auth = () => {
                                 className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                                 id="email"
                                 placeholder="Email"
+                                required
                                 value={values.email}
                                 onChange={handleChange}
                                 />
@@ -90,6 +105,7 @@ const Auth = () => {
                                 className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                                 id="password"
                                 placeholder="Password"
+                                required
                                 value={values.password}
                                 onChange={handleChange}
                                 />
