@@ -61,8 +61,6 @@ const Patient = () => {
     useEffect(() => {
         if(!isLogged){
             navigate('/login');
-        }else if(user.rol === 'Assistant'){
-            navigate('/')
         }
     },[]);
 

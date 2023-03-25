@@ -3,18 +3,34 @@ import { Navbar } from "../../component";
 import { AuthContext } from '../../context/auth.context';
 import { useNavigate } from 'react-router-dom';
 import { patientListEp } from "../../services/patient.services";
+import { regiterClinicHistoryEp } from "../../services/clinichistory.services";
+import Swal from "sweetalert2";
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 
 const ClincHistory = () => {
 
     const navigate = useNavigate();
     const { isLogged, user } = useContext(AuthContext);
-    const [patient, setPatient] = useState('');
     const [familyHistory, setFamilyHistory] = useState('');
     const [allergic, setAllergic] = useState('');
     const [laboratories, setLaboratories] = useState('');
     const [birthdate, setBirthdate] = useState('');
+    const [patient, setPatient] = useState('');
+    const [idPatient, setIdPatient] = useState('');
     const [listPatient, setListPatient] = useState([]);
+    const [errors, setErrors] = useState([]);
+    
+    const onChange = (evt) => {
+        setPatient(evt.target.value);
+    };
+
+    const onSearch = (searchPatient, idPatient) => {
+        setPatient(searchPatient);
+        setIdPatient(idPatient);
+    }
 
     const clearInputs = () => {
         setPatient('');
@@ -24,21 +40,37 @@ const ClincHistory = () => {
         setBirthdate('');
     }
 
+    const showAlert = () => {
+        MySwal.fire({
+            title: "¡Registro exitoso!",
+            text:"Los datos de la historia clinica fueron registrados correctamente",
+            icon: "success",
+            timer: 4000
+        })
+    }
+
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
             const payload = {
                 patient,
-                familyHistory,
+                family_history:familyHistory,
                 allergic,
-                laboratories,
-                birthdate
+                clinical_laboratories:laboratories,
+                birthdate,
+                _patient:idPatient
             };
-            console.log(payload);
+            await regiterClinicHistoryEp(payload);
+            setErrors([]);
+            clearInputs();
+            showAlert();
         } catch (error) {
-            
-        }
-    }
+            if(error.response.status === 400){
+                setErrors(error.response.data.errorMsg);
+            };
+            console.error(error.response.data);
+        };
+    };
 
     useEffect(() => {
         if(!isLogged){
@@ -58,10 +90,14 @@ const ClincHistory = () => {
             .catch(console.error);
     },[]);
 
-    console.log(listPatient);
     return(
         <div>
             <Navbar {...user} />
+            {errors.map((err, idx) => (
+                <div key={idx} className="flex justify-center">
+                    <p class="bg-red-100 border border-red-400 text-red-700 uppercase text-xs text-center p-2 mb-1 mt-1 font-bold rounded-md w-full max-w-lg">{err.msg}</p>
+                </div>
+            ))}
             <div className="flex justify-center mt-14">
                 <form className="w-full max-w-lg">
                     <h1 className="block uppercase tracking-wide text-gray-700 font-bold mb-2">Register Medical History</h1>
@@ -76,9 +112,28 @@ const ClincHistory = () => {
                                 className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
                                 id="grid-patient" 
                                 type="text"
+                                placeholder="Name"
                                 value={patient}
-                                onChange={(e) => setPatient(e.target.value)}
+                                onChange={onChange}
                             />
+                            <div className="bg-white flex flex-col border-gray-300">
+                                {listPatient.filter(item => {
+                                    const searchPatient = patient.toLowerCase();
+                                    const fullName = (item.name + " " + item.surname).toLowerCase();
+
+                                    return searchPatient && fullName.startsWith(searchPatient) && fullName !== searchPatient;
+                                })
+                                .slice(0,3)
+                                .map((item) => (
+                                    <div 
+                                        key={item._id}
+                                        onClick={() => onSearch(item.name +" "+ item.surname,item._id)}
+                                        className=" cursor-pointer text-start m-1"
+                                    >
+                                            {item.name + " " + item.surname}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-wrap -mx-3 mb-6">
@@ -90,6 +145,7 @@ const ClincHistory = () => {
                                 name="family_history"
                                 className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
                                 id="grid-family_history" 
+                                placeholder="Family History"
                                 value={familyHistory}
                                 onChange={(e) => setFamilyHistory(e.target.value)}
                             />
@@ -104,6 +160,7 @@ const ClincHistory = () => {
                                 name="allergic"
                                 className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
                                 id="grid-allergic" 
+                                placeholder="Allergic"
                                 value={allergic}
                                 onChange={(e) => setAllergic(e.target.value)}
                             />
@@ -118,6 +175,7 @@ const ClincHistory = () => {
                                 name="clinical_laboratories"
                                 className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
                                 id="grid-clinical_laboratories" 
+                                placeholder="Clinical Laboratories"
                                 value={laboratories}
                                 onChange={(e) => {setLaboratories(e.target.value)}}
                             />
