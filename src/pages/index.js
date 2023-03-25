@@ -5,3 +5,4 @@ export {default as LogoutPage} from './Logout/LogoutPage.jsx';
 export {default as Singup} from './Singup/Singup.jsx';
 export {default as Collaborator} from './Collaborator/Collaborator.jsx';
 export {default as Patient} from './Patient/Patient.jsx';
+export {default as ClincHistory} from './ClinicHistory/ClinicHistory.jsx';
